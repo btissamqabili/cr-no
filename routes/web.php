@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\CreneauController;
+use App\Http\Controllers\Admin\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,12 +27,13 @@ Route::middleware('auth')->prefix('client')->name('client.')->group(function () 
 
 // ===== ROUTES ADMIN (protégées) =====
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    
-    Route::get('/dashboard', function () {
-        return 'Bienvenue sur le tableau de bord Administrateur';
-    })->name('dashboard');
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
     // Plus tard on ajoutera ici le CRUD des créneaux
+  Route::resource('creneaux', CreneauController::class)
+    ->parameters(['creneaux' => 'creneau']);
 });
 
 require __DIR__.'/auth.php';
