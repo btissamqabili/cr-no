@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class RendezVous extends Model
 {
@@ -12,24 +11,14 @@ class RendezVous extends Model
 
     protected $table = 'rendez_vous';
 
-    protected $fillable = [
-        'user_id',
-        'creneau_id',
-        'statut',
-    ];
+    protected $fillable = ['user_id', 'creneau_id', 'statut'];
 
-    /**
-     * Le client propriétaire du rendez-vous.
-     */
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Le créneau réservé.
-     */
-    public function creneau(): BelongsTo
+    public function creneau()
     {
         return $this->belongsTo(Creneau::class);
     }
