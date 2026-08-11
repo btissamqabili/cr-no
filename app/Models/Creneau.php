@@ -2,86 +2,44 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 
 class Creneau extends Model
 {
     use HasFactory;
+    protected $table = 'creneaux';
 
-    protected $fillable = [
-        'date',
-        'heure_debut',
-        'duree',
+    protected $fillable = ['date', 'heure_debut', 'duree'];
+
+    protected $casts = [
+        'date' => 'date',
     ];
 
-    /**
-     * Les rendez-vous liés à ce créneau.
-     */
-    public function rendezVous(): HasMany
+    // Un créneau peut avoir un rendez-vous
+    public function rendezVous()
     {
-        return $this->hasMany(RendezVous::class);
+        return $this->hasOne(RendezVous::class);
     }
 
-
-    
-  public function scopeDisponibles(Builder $query): Builder
-{
-    return $query
-        ->whereRaw(
-            "TIMESTAMP(date, heure_debut) >= ?",
-            [now()]
-        )
-        ->whereDoesntHave('rendezVous', function ($query) {
-            $query->whereIn('statut', [
-                'en_attente',
-                'confirme',
-            ]);
-        });
-}
-
-    /**
-     * Scope : récupérer les créneaux déjà passés.
-     */
-    public function scopePasses(Builder $query): Builder
+    // Scope : créneaux disponibles (pas encore réservés + pas passés)
+    public function scopeDisponibles($query)
     {
-        return $query->whereRaw(
-            "TIMESTAMP(date, heure_debut) < ?",
-            [now()]
-        );
+        return $query->whereDoesntHave('rendezVous')
+                     ->where(function ($q) {
+                         $q->where('date', '>', now()->toDateString())
+                           ->orWhere(function ($q2) {
+                               $q2->where('date', '=', now()->toDateString())
+                                  ->where('heure_debut', '>', now()->format('H:i:s'));
+                           });
+                     });
     }
 
-   
-    public static function chevauche(
-        string $date,
-        string $heureDebut,
-        int $duree
-    ): bool {
-        $nouveauDebut = Carbon::parse("$date $heureDebut");
-
-        $nouvelleFin = $nouveauDebut
-            ->copy()
-            ->addMinutes($duree);
-
-        return self::whereDate('date', $date)
-            ->get()
-            ->contains(function (Creneau $creneau) use (
-                $nouveauDebut,
-                $nouvelleFin
-            ) {
-                $debutExistant = Carbon::parse(
-                    $creneau->date . ' ' . $creneau->heure_debut
-                );
-
-                $finExistante = $debutExistant
-                    ->copy()
-                    ->addMinutes($creneau->duree);
-
-                return $nouveauDebut < $finExistante
-                    && $nouvelleFin > $debutExistant;
-            });
+    // Vérifier si le créneau est passé
+    public function estPasse(): bool
+    {
+        $dateHeure = Carbon::parse($this->date->format('Y-m-d') . ' ' . $this->heure_debut);
+        return $dateHeure->isPast();
     }
 }
