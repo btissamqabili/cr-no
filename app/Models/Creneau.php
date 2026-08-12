@@ -48,6 +48,15 @@ class Creneau extends Model
     /**
      * Scope : récupérer les créneaux déjà passés.
      */
+    /**
+ * Vérifie si le créneau est passé.
+ */
+public function estPasse(): bool
+{
+    return Carbon::parse(
+        $this->date->format('Y-m-d') . ' ' . $this->heure_debut
+    )->isPast();
+}
     public function scopePasses(Builder $query): Builder
     {
         return $query->whereRaw(
@@ -60,7 +69,7 @@ class Creneau extends Model
      * Vérifie si un nouveau créneau chevauche
      * un créneau existant.
      */
-   public static function chevauche(
+  public static function chevauche(
     string $date,
     string $heureDebut,
     int $duree,
@@ -75,7 +84,6 @@ class Creneau extends Model
 
     $query = self::whereDate('date', $date);
 
-    // إذا كنا في update، نتجاهل créneau الحالي
     if ($excludeId !== null) {
         $query->where('id', '!=', $excludeId);
     }
@@ -96,5 +104,6 @@ class Creneau extends Model
         return $nouveauDebut < $finExistante
             && $nouvelleFin > $debutExistant;
     });
+
 }
 }

@@ -224,10 +224,9 @@
                                 @foreach($creneaux as $creneau)
 
                                     @php
-                                        $dateHeure = \Carbon\Carbon::parse(
-                                            $creneau->date . ' ' . $creneau->heure_debut
-                                        );
-
+                                 $dateHeure = \Carbon\Carbon::parse(
+    $creneau->date->format('Y-m-d') . ' ' . $creneau->heure_debut
+);
                                         $reserve = $creneau->rendezVous->isNotEmpty();
                                         $passe = $dateHeure->isPast();
                                     @endphp

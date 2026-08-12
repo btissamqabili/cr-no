@@ -19,27 +19,31 @@ class ReservationController extends Controller
 
     // Réserver un créneau
     public function store(Request $request)
-    {
-        $request->validate([
-            'creneau_id' => 'required|exists:creneaux,id',
-        ]);
+{
+    $request->validate([
+        'creneau_id' => 'required|exists:creneaux,id',
+    ]);
 
-        $creneau = Creneau::findOrFail($request->creneau_id);
+    $creneau = Creneau::findOrFail($request->creneau_id);
 
-        // Sécurité : créneau déjà réservé ou passé
-        if ($creneau->rendezVous || $creneau->estPasse()) {
-            return back()->with('error', 'Ce créneau n\'est plus disponible.');
-        }
-
-        // Créer le rendez-vous
-        RendezVous::create([
-            'user_id' => Auth::id(),
-            'creneau_id' => $creneau->id,
-            'statut' => 'en_attente',
-        ]);
-
-        return redirect()->route('client.mes-rdv')->with('success', 'Rendez-vous réservé avec succès !');
+    // Vérifier si le créneau est déjà réservé ou passé
+    if ($creneau->rendezVous()->exists() || $creneau->estPasse()) {
+        return back()->with(
+            'error',
+            'Ce créneau n\'est plus disponible.'
+        );
     }
+
+    RendezVous::create([
+        'user_id' => Auth::id(),
+        'creneau_id' => $creneau->id,
+        'statut' => 'en_attente',
+    ]);
+
+    return redirect()
+        ->route('client.mes-rdv')
+        ->with('success', 'Rendez-vous réservé avec succès !');
+}
 
     // Mes rendez-vous
     public function mesRendezVous()
