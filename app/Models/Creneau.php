@@ -67,7 +67,8 @@ class Creneau extends Model
     ?int $excludeId = null
 ): bool {
 
-    $nouveauDebut = Carbon::parse("$date $heureDebut");
+    $nouveauDebut = Carbon::parse($date)
+        ->setTimeFromTimeString($heureDebut);
 
     $nouvelleFin = $nouveauDebut
         ->copy()
@@ -85,9 +86,8 @@ class Creneau extends Model
         $nouvelleFin
     ) {
 
-        $debutExistant = Carbon::parse(
-            $creneau->date . ' ' . $creneau->heure_debut
-        );
+        $debutExistant = Carbon::parse($creneau->date)
+            ->setTimeFromTimeString($creneau->heure_debut);
 
         $finExistante = $debutExistant
             ->copy()

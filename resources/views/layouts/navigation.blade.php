@@ -3,26 +3,69 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
-                </div>
+              <div class="flex items-center gap-3">
+    <svg
+        class="h-10 w-10 text-indigo-600"
+        viewBox="0 0 48 48"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <rect
+            x="7"
+            y="10"
+            width="34"
+            height="31"
+            rx="6"
+            stroke="currentColor"
+            stroke-width="3"
+        />
+
+        <path
+            d="M7 19H41"
+            stroke="currentColor"
+            stroke-width="3"
+        />
+
+        <path
+            d="M16 6V14M32 6V14"
+            stroke="currentColor"
+            stroke-width="3"
+            stroke-linecap="round"
+        />
+
+        <path
+            d="M16 29L21 34L33 22"
+            stroke="currentColor"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        />
+    </svg>
+
+    <span class="text-xl font-bold text-gray-800">
+        Creno
+    </span>
+</div>
+            
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
 
-                    <x-nav-link :href="route('client.creneaux')" :active="request()->routeIs('client.creneaux')">
-                        Créneaux
-                    </x-nav-link>
+                    @if(Auth::user()->role === 'client')
+    <x-nav-link :href="route('client.creneaux')" :active="request()->routeIs('client.creneaux')">
+        Créneaux
+    </x-nav-link>
 
-                    <x-nav-link :href="route('client.mes-rdv')" :active="request()->routeIs('client.mes-rdv')">
-                        Mes RDV
-                    </x-nav-link>
+    <x-nav-link :href="route('client.mes-rdv')" :active="request()->routeIs('client.mes-rdv')">
+        Mes RDV
+    </x-nav-link>
+@endif
+
+@if(Auth::user()->role === 'admin')
+    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+        Administration
+    </x-nav-link>
+@endif
                 </div>
             </div>
 
@@ -75,17 +118,22 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+        
+@if(Auth::user()->role === 'client')
+    <x-responsive-nav-link :href="route('client.creneaux')" :active="request()->routeIs('client.creneaux')">
+        Créneaux
+    </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('client.creneaux')" :active="request()->routeIs('client.creneaux')">
-                Créneaux
-            </x-responsive-nav-link>
+    <x-responsive-nav-link :href="route('client.mes-rdv')" :active="request()->routeIs('client.mes-rdv')">
+        Mes RDV
+    </x-responsive-nav-link>
+@endif
 
-            <x-responsive-nav-link :href="route('client.mes-rdv')" :active="request()->routeIs('client.mes-rdv')">
-                Mes RDV
-            </x-responsive-nav-link>
+@if(Auth::user()->role === 'admin')
+    <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+        Administration
+    </x-responsive-nav-link>
+@endif
         </div>
 
         <!-- Responsive Settings Options -->
