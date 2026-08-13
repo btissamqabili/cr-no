@@ -1,4 +1,4 @@
-```blade
+
 <x-app-layout>
 
     <x-slot name="header">
@@ -105,7 +105,10 @@
                             </p>
 
                             <p class="mt-2 text-3xl font-bold text-gray-900">
-                                {{ $creneaux->filter(fn($creneau) => $creneau->rendezVous->isEmpty() && \Carbon\Carbon::parse($creneau->date . ' ' . $creneau->heure_debut)->isFuture())->count() }}
+                                {{ $creneaux->filter(fn($creneau) =>
+    $creneau->rendezVous->isEmpty() &&
+    \Carbon\Carbon::parse($creneau->date)->setTimeFromTimeString($creneau->heure_debut)->isFuture()
+)->count() }}
                             </p>
                         </div>
 

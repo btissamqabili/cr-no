@@ -76,7 +76,8 @@ public function estPasse(): bool
     ?int $excludeId = null
 ): bool {
 
-    $nouveauDebut = Carbon::parse("$date $heureDebut");
+    $nouveauDebut = Carbon::parse($date)
+        ->setTimeFromTimeString($heureDebut);
 
     $nouvelleFin = $nouveauDebut
         ->copy()
@@ -93,9 +94,8 @@ public function estPasse(): bool
         $nouvelleFin
     ) {
 
-        $debutExistant = Carbon::parse(
-            $creneau->date . ' ' . $creneau->heure_debut
-        );
+        $debutExistant = Carbon::parse($creneau->date)
+            ->setTimeFromTimeString($creneau->heure_debut);
 
         $finExistante = $debutExistant
             ->copy()
